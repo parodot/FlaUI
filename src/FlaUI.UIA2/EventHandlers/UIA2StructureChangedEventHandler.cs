@@ -1,17 +1,20 @@
 ﻿using System;
 using FlaUI.Core;
-using FlaUI.Core.AutomationElements.Infrastructure;
+using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.EventHandlers;
 using UIA = System.Windows.Automation;
 
 namespace FlaUI.UIA2.EventHandlers
 {
+    /// <summary>
+    /// UIA2 implementation of a structure changed event handler.
+    /// </summary>
     public class UIA2StructureChangedEventHandler : StructureChangedEventHandlerBase
     {
-        public UIA.StructureChangedEventHandler EventHandler { get; private set; }
+        public UIA.StructureChangedEventHandler EventHandler { get; }
 
-        public UIA2StructureChangedEventHandler(AutomationBase automation, Action<AutomationElement, StructureChangeType, int[]> callAction) : base(automation, callAction)
+        public UIA2StructureChangedEventHandler(FrameworkAutomationElementBase frameworkElement, Action<AutomationElement, StructureChangeType, int[]> callAction) : base(frameworkElement, callAction)
         {
             EventHandler = HandleStructureChangedEvent;
         }

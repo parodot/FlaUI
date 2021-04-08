@@ -1,5 +1,4 @@
-﻿using FlaUI.Core.AutomationElements.Infrastructure;
-using FlaUI.Core.AutomationElements.PatternElements;
+﻿using FlaUI.Core.AutomationElements.PatternElements;
 
 namespace FlaUI.Core.AutomationElements
 {

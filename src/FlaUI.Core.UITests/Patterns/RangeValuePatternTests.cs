@@ -1,4 +1,4 @@
-﻿using FlaUI.Core.AutomationElements.Infrastructure;
+﻿using FlaUI.Core.AutomationElements;
 using FlaUI.Core.UITests.TestFramework;
 using NUnit.Framework;
 
@@ -35,7 +35,7 @@ namespace FlaUI.Core.UITests.Patterns
 
         private AutomationElement GetSlider()
         {
-            var element = App.GetMainWindow(Automation).FindFirstDescendant(cf => cf.ByAutomationId("Slider"));
+            var element = Application.GetMainWindow(Automation).FindFirstDescendant(cf => cf.ByAutomationId("Slider"));
             return element;
         }
     }

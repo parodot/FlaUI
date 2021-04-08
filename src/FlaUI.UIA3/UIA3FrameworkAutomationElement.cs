@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using FlaUI.Core;
-using FlaUI.Core.AutomationElements.Infrastructure;
+using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Conditions;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.EventHandlers;
 using FlaUI.Core.Identifiers;
-using FlaUI.Core.Shapes;
 using FlaUI.Core.Tools;
 using FlaUI.UIA3.Converters;
 using FlaUI.UIA3.EventHandlers;
@@ -24,44 +24,54 @@ namespace FlaUI.UIA3
         }
 
         /// <summary>
-        /// Concrete implementation of the automation object
+        /// Concrete implementation of the automation object.
         /// </summary>
         public new UIA3Automation Automation { get; }
 
         /// <summary>
-        /// Native object for the ui element
+        /// Native object for the ui element.
         /// </summary>
         public UIA.IUIAutomationElement NativeElement { get; }
 
         /// <summary>
-        /// Native object for Windows 8 ui element
+        /// Native object for Windows 8 ui element.
         /// </summary>
         public UIA.IUIAutomationElement2 NativeElement2 => GetAutomationElementAs<UIA.IUIAutomationElement2>();
 
         /// <summary>
-        /// Native object for Windows 8.1 ui element
+        /// Native object for Windows 8.1 ui element.
         /// </summary>
         public UIA.IUIAutomationElement3 NativeElement3 => GetAutomationElementAs<UIA.IUIAutomationElement3>();
 
         /// <summary>
-        /// Native object for Windows 10 ui element
+        /// Native object for Windows 10 ui element.
         /// </summary>
         public UIA.IUIAutomationElement4 NativeElement4 => GetAutomationElementAs<UIA.IUIAutomationElement4>();
 
         /// <summary>
-        /// Native object for second Windows 10 ui element
+        /// Native object for the second Windows 10 ui element.
         /// </summary>
         public UIA.IUIAutomationElement5 NativeElement5 => GetAutomationElementAs<UIA.IUIAutomationElement5>();
 
         /// <summary>
-        /// Native object for third Windows 10 ui element
+        /// Native object for the third Windows 10 ui element.
         /// </summary>
         public UIA.IUIAutomationElement6 NativeElement6 => GetAutomationElementAs<UIA.IUIAutomationElement6>();
 
         /// <summary>
-        /// Native object fourth for Windows 10 ui element
+        /// Native object for the fourth for Windows 10 ui element.
         /// </summary>
         public UIA.IUIAutomationElement7 NativeElement7 => GetAutomationElementAs<UIA.IUIAutomationElement7>();
+
+        /// <summary>
+        /// Native object for the fifth for Windows 10 ui element.
+        /// </summary>
+        public UIA.IUIAutomationElement8 NativeElement8 => GetAutomationElementAs<UIA.IUIAutomationElement8>();
+
+        /// <summary>
+        /// Native object for the sixth for Windows 10 ui element.
+        /// </summary>
+        public UIA.IUIAutomationElement9 NativeElement9 => GetAutomationElementAs<UIA.IUIAutomationElement9>();
 
         public override void SetFocus()
         {
@@ -124,7 +134,7 @@ namespace FlaUI.UIA3
         }
 
         /// <inheritdoc />
-        public override AutomationElement FindIndexed(TreeScope treeScope, int index, ConditionBase condition)
+        public override AutomationElement FindAt(TreeScope treeScope, int index, ConditionBase condition)
         {
             var nativeFoundElements = CacheRequest.IsCachingActive
                 ? NativeElement.FindAllBuildCache((UIA.TreeScope)treeScope, ConditionConverter.ToNative(Automation, condition), CacheRequest.Current.ToNative(Automation))
@@ -133,62 +143,123 @@ namespace FlaUI.UIA3
             return nativeElement == null ? null : AutomationElementConverter.NativeToManaged(Automation, nativeElement);
         }
 
+        /// <inheritdoc />
         public override bool TryGetClickablePoint(out Point point)
         {
-            var tagPoint = new UIA.tagPOINT { x = 0, y = 0 };
-            var success = Com.Call(() => NativeElement.GetClickablePoint(out tagPoint)) != 0;
-            if (success)
+            try
             {
-                point = new Point(tagPoint.x, tagPoint.y);
+                // Variant 1: Directly try getting the point
+                var tagPoint = new UIA.tagPOINT { x = 0, y = 0 };
+                if (Com.Call(() => NativeElement.GetClickablePoint(out tagPoint)) != 0)
+                {
+                    point = new Point(tagPoint.x, tagPoint.y);
+                    return true;
+                }
+                // Variant 2: Try to get it from the property
+                if (Properties.ClickablePoint.TryGetValue(out point))
+                {
+                    return true;
+                }
+                // Variant 3: Get the center of the bounding rectangle
+                if (Properties.BoundingRectangle.TryGetValue(out var br))
+                {
+                    point = br.Center();
+                    return true;
+                }
             }
-            else
+            catch
             {
-                success = Properties.ClickablePoint.TryGetValue(out point);
+                // Noop
             }
-            return success;
+            point = Point.Empty;
+            return false;
         }
 
-        public override IAutomationEventHandler RegisterEvent(EventId @event, TreeScope treeScope, Action<AutomationElement, EventId> action)
+        /// <inheritdoc />
+        public override ActiveTextPositionChangedEventHandlerBase RegisterActiveTextPositionChangedEvent(TreeScope treeScope, Action<AutomationElement, ITextRange> action)
         {
-            var eventHandler = new UIA3BasicEventHandler(Automation, action);
+            var eventHandler = new UIA3ActiveTextPositionChangedEventHandler(this, action);
+            Automation.NativeAutomation6.AddActiveTextPositionChangedEventHandler(NativeElement, (UIA.TreeScope)treeScope, null, eventHandler);
+            return eventHandler;
+        }
+
+        /// <inheritdoc />
+        public override AutomationEventHandlerBase RegisterAutomationEvent(EventId @event, TreeScope treeScope, Action<AutomationElement, EventId> action)
+        {
+            var eventHandler = new UIA3AutomationEventHandler(this, @event, action);
             Automation.NativeAutomation.AddAutomationEventHandler(@event.Id, NativeElement, (UIA.TreeScope)treeScope, null, eventHandler);
             return eventHandler;
         }
 
-        public override IAutomationPropertyChangedEventHandler RegisterPropertyChangedEvent(TreeScope treeScope, Action<AutomationElement, PropertyId, object> action, PropertyId[] properties)
+        /// <inheritdoc />
+        public override PropertyChangedEventHandlerBase RegisterPropertyChangedEvent(TreeScope treeScope, Action<AutomationElement, PropertyId, object> action, PropertyId[] properties)
         {
-            var eventHandler = new UIA3PropertyChangedEventHandler(Automation, action);
+            var eventHandler = new UIA3PropertyChangedEventHandler(this, action);
             var propertyIds = properties.Select(p => p.Id).ToArray();
             Automation.NativeAutomation.AddPropertyChangedEventHandler(NativeElement,
                 (UIA.TreeScope)treeScope, null, eventHandler, propertyIds);
             return eventHandler;
         }
 
-        public override IAutomationStructureChangedEventHandler RegisterStructureChangedEvent(TreeScope treeScope, Action<AutomationElement, StructureChangeType, int[]> action)
+        /// <inheritdoc />
+        public override StructureChangedEventHandlerBase RegisterStructureChangedEvent(TreeScope treeScope, Action<AutomationElement, StructureChangeType, int[]> action)
         {
-            var eventHandler = new UIA3StructureChangedEventHandler(Automation, action);
+            var eventHandler = new UIA3StructureChangedEventHandler(this, action);
             Automation.NativeAutomation.AddStructureChangedEventHandler(NativeElement, (UIA.TreeScope)treeScope, null, eventHandler);
             return eventHandler;
         }
 
-        public override INotificationEventHandler RegisterNotificationEvent()
+        /// <inheritdoc />
+        public override NotificationEventHandlerBase RegisterNotificationEvent(TreeScope treeScope, Action<AutomationElement, NotificationKind, NotificationProcessing, string, string> action)
         {
-            throw new NotImplementedException();
+            var eventHandler = new UIA3NotificationEventHandler(this, action);
+            Automation.NativeAutomation5.AddNotificationEventHandler(NativeElement, (UIA.TreeScope)treeScope, null, eventHandler);
+            return eventHandler;
         }
 
-        public override void RemoveAutomationEventHandler(EventId @event, IAutomationEventHandler eventHandler)
+        /// <inheritdoc />
+        public override TextEditTextChangedEventHandlerBase RegisterTextEditTextChangedEventHandler(TreeScope treeScope, TextEditChangeType textEditChangeType, Action<AutomationElement, TextEditChangeType, string[]> action)
         {
-            Automation.NativeAutomation.RemoveAutomationEventHandler(@event.Id, NativeElement, (UIA3BasicEventHandler)eventHandler);
+            var eventHandler = new UIA3TextEditTextChangedEventHandler(this, action);
+            Automation.NativeAutomation3.AddTextEditTextChangedEventHandler(NativeElement, (UIA.TreeScope)treeScope, (UIA.TextEditChangeType)textEditChangeType, null, eventHandler);
+            return eventHandler;
         }
 
-        public override void RemovePropertyChangedEventHandler(IAutomationPropertyChangedEventHandler eventHandler)
+        /// <inheritdoc />
+        public override void UnregisterActiveTextPositionChangedEventHandler(ActiveTextPositionChangedEventHandlerBase eventHandler)
+        {
+            Automation.NativeAutomation6.RemoveActiveTextPositionChangedEventHandler(NativeElement, (UIA3ActiveTextPositionChangedEventHandler)eventHandler);
+        }
+
+        /// <inheritdoc />
+        public override void UnregisterAutomationEventHandler(AutomationEventHandlerBase eventHandler)
+        {
+            var frameworkEventHandler = (UIA3AutomationEventHandler)eventHandler;
+            Automation.NativeAutomation.RemoveAutomationEventHandler(frameworkEventHandler.Event.Id, NativeElement, frameworkEventHandler);
+        }
+
+        /// <inheritdoc />
+        public override void UnregisterPropertyChangedEventHandler(PropertyChangedEventHandlerBase eventHandler)
         {
             Automation.NativeAutomation.RemovePropertyChangedEventHandler(NativeElement, (UIA3PropertyChangedEventHandler)eventHandler);
         }
 
-        public override void RemoveStructureChangedEventHandler(IAutomationStructureChangedEventHandler eventHandler)
+        /// <inheritdoc />
+        public override void UnregisterStructureChangedEventHandler(StructureChangedEventHandlerBase eventHandler)
         {
             Automation.NativeAutomation.RemoveStructureChangedEventHandler(NativeElement, (UIA3StructureChangedEventHandler)eventHandler);
+        }
+
+        /// <inheritdoc />
+        public override void UnregisterNotificationEventHandler(NotificationEventHandlerBase eventHandler)
+        {
+            Automation.NativeAutomation5.RemoveNotificationEventHandler(NativeElement, (UIA3NotificationEventHandler)eventHandler);
+        }
+
+        /// <inheritdoc />
+        public override void UnregisterTextEditTextChangedEventHandler(TextEditTextChangedEventHandlerBase eventHandler)
+        {
+            Automation.NativeAutomation3.RemoveTextEditTextChangedEventHandler(NativeElement, (UIA3TextEditTextChangedEventHandler)eventHandler);
         }
 
         public override PatternId[] GetSupportedPatterns()

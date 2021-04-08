@@ -26,6 +26,7 @@
                     <MenuItem Header="Fancy" />
                 </MenuItem>
                 <MenuItem Header="Paste" />
+                <MenuItem Header="Show Label" IsCheckable="true" IsChecked="true" Click="OnShowLabel"/>
             </MenuItem>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom">
@@ -34,8 +35,9 @@
         <TabControl>
             <TabItem Header="Simple Controls">
                 <StackPanel Orientation="Vertical">
-                    <Label Content="Test Label" />
-                    <TextBox AutomationProperties.AutomationId="TextBox" />
+                    <Label Content="Test Label" Foreground="Blue" />
+                    <TextBox AutomationProperties.AutomationId="TextBox" Text="Test TextBox" Foreground="Green"/>
+                    <PasswordBox AutomationProperties.AutomationId="PasswordBox" Password="MyPassword" />
                     <ComboBox Width="120" IsEditable="True" AutomationProperties.AutomationId="EditableCombo">
                         <TextBlock Text="Item 1" AutomationProperties.AutomationId="EditableComboItem1" />
                         <TextBlock Text="Item 2" AutomationProperties.AutomationId="EditableComboItem2" />
@@ -91,6 +93,7 @@
                            Placement="Top"
                            PlacementTarget="{Binding ElementName=PopupToggleButton2}"
                            StaysOpen="False" />
+                    <Label Content="Menu Item Checked" Foreground="Red" x:Name="lblMenuChk"/>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Complex Controls">
@@ -168,10 +171,25 @@
                             </ListView>
                         </GroupBox>
                         <GroupBox Header="Grid">
-                            <DataGrid AutomationProperties.AutomationId="dataGrid1" CanUserAddRows="False" ItemsSource="{Binding DataGridItems}" />
+                            <DataGrid AutomationProperties.AutomationId="dataGridView" CanUserAddRows="True" ItemsSource="{Binding DataGridItems}" />
                         </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
+            </TabItem>
+            <TabItem Header="More Controls">
+                <StackPanel>
+                    <Calendar AutomationProperties.AutomationId="calendar" SelectionMode="MultipleRange" />
+                    <DatePicker AutomationProperties.AutomationId="datePicker"></DatePicker>
+                    <ListBox AutomationProperties.AutomationId="LargeListBox" Height="45" SelectionMode="Extended">
+                        <ListBoxItem>ListBox Item #1</ListBoxItem>
+                        <ListBoxItem>ListBox Item #2</ListBoxItem>
+                        <ListBoxItem>ListBox Item #3</ListBoxItem>
+                        <ListBoxItem>ListBox Item #4</ListBoxItem>
+                        <ListBoxItem>ListBox Item #5</ListBoxItem>
+                        <ListBoxItem>ListBox Item #6</ListBoxItem>
+                        <ListBoxItem>ListBox Item #7</ListBoxItem>
+                    </ListBox>
+                </StackPanel>
             </TabItem>
         </TabControl>
     </DockPanel>

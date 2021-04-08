@@ -7,6 +7,7 @@ using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Logging;
 using FlaUI.Core.Tools;
+using FlaUI.Core.WindowsAPI;
 
 namespace FlaUI.Core
 {
@@ -18,7 +19,7 @@ namespace FlaUI.Core
         /// <summary>
         /// The process of this application.
         /// </summary>
-        private readonly Process _process;
+        private Process _process;
 
         /// <summary>
         /// Flag to indicate if Dispose has already been called.
@@ -26,12 +27,17 @@ namespace FlaUI.Core
         private bool _disposed;
 
         /// <summary>
+        /// The timeout to wait to close an application gracefully.
+        /// </summary>
+        public TimeSpan CloseTimeout { get; set; } = TimeSpan.FromSeconds(5);
+
+        /// <summary>
         /// Flag to indicate, if the application is a windows store app.
         /// </summary>
         public bool IsStoreApp { get; }
 
         /// <summary>
-        /// The proces Id of the application.
+        /// The process id of the application.
         /// </summary>
         public int ProcessId => _process.Id;
 
@@ -80,8 +86,9 @@ namespace FlaUI.Core
         /// <summary>
         /// Closes the application. Force-closes it after a small timeout.
         /// </summary>
-        /// <returns>Returns true if the application was closed normally and false if it was force-closed.</returns>
-        public bool Close()
+        /// <param name="killIfCloseFails">A flag to indicate if the process should be killed if closing fails within the <see cref="CloseTimeout"/>.</param>
+        /// <returns>Returns true if the application was closed normally and false if it could not be closed gracefully.</returns>
+        public bool Close(bool killIfCloseFails = true)
         {
             Logger.Default.Debug("Closing application");
             if (_disposed || _process.HasExited)
@@ -93,12 +100,17 @@ namespace FlaUI.Core
             {
                 return true;
             }
-            _process.WaitForExit(5000);
+            // Gracefully wait until it exits
+            _process.WaitForExit((int)CloseTimeout.TotalMilliseconds);
             if (!_process.HasExited)
             {
-                Logger.Default.Info("Application failed to exit, killing process");
-                _process.Kill();
-                _process.WaitForExit(5000);
+                // It hasn't exited yet so kill it
+                Logger.Default.Info("Application failed to exit");
+                if (killIfCloseFails)
+                {
+                    _process.Kill();
+                    _process.WaitForExit(5000);
+                }
                 return false;
             }
             return true;
@@ -124,12 +136,18 @@ namespace FlaUI.Core
             }
         }
 
+        /// <summary>
+        /// Disposes the application.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Disposes the application.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
@@ -143,17 +161,33 @@ namespace FlaUI.Core
             _disposed = true;
         }
 
+        /// <summary>
+        /// Attaches to a given process id.
+        /// </summary>
+        /// <param name="processId">The id of the process to attach to.</param>
+        /// <returns>An application instance which is attached to the process.</returns>
         public static Application Attach(int processId)
         {
             return Attach(FindProcess(processId));
         }
 
+        /// <summary>
+        /// Attaches to a given process.
+        /// </summary>
+        /// <param name="process">The process to attach to.</param>
+        /// <returns>An application instance which is attached to the process.</returns>
         public static Application Attach(Process process)
         {
-            Logger.Default.Debug($"[Attaching to process:{process.Id}] [Process name:{process.ProcessName}] [Process full path:{process.MainModule.FileName}]");
+            Logger.Default.Debug($"[Attaching to process:{process.Id}] [Process name:{process.ProcessName}] [Process full path:{WindowsApiTools.GetMainModuleFilepath(process)}]");
             return new Application(process);
         }
 
+        /// <summary>
+        /// Attaches to a running process which has the given executable.
+        /// </summary>
+        /// <param name="executable">The executable of the process to attach to.</param>
+        /// <param name="index">Defines the index of the process to use in case multiple are found.</param>
+        /// <returns>An application instance which is attached to the process.</returns>
         public static Application Attach(string executable, int index = 0)
         {
             var processes = FindProcess(executable);
@@ -164,18 +198,30 @@ namespace FlaUI.Core
             throw new Exception("Unable to find process with name: " + executable);
         }
 
+        /// <summary>
+        /// Attaches or launches the given process.
+        /// </summary>
         public static Application AttachOrLaunch(ProcessStartInfo processStartInfo)
         {
             var processes = FindProcess(processStartInfo.FileName);
             return processes.Length == 0 ? Launch(processStartInfo) : Attach(processes[0]);
         }
 
-        public static Application Launch(string executable)
+        /// <summary>
+        /// Launches the given executable.
+        /// </summary>
+        /// <param name="executable">The executable to launch.</param>
+        /// <param name="arguments">Arguments to executable</param>
+        public static Application Launch(string executable, string arguments = null)
         {
-            var processStartInfo = new ProcessStartInfo(executable);
+            var processStartInfo = new ProcessStartInfo(executable, arguments);
             return Launch(processStartInfo);
         }
 
+        /// <summary>
+        /// Launches an application with the given process information.
+        /// </summary>
+        /// <param name="processStartInfo">The process information used to launch the application.</param>
         public static Application Launch(ProcessStartInfo processStartInfo)
         {
             if (String.IsNullOrEmpty(processStartInfo.WorkingDirectory))
@@ -209,6 +255,11 @@ namespace FlaUI.Core
             return new Application(process);
         }
 
+        /// <summary>
+        /// Launches a store application.
+        /// </summary>
+        /// <param name="appUserModelId">The app id of the application to launch.</param>
+        /// <param name="arguments">The arguments to pass to the application.</param>
         public static Application LaunchStoreApp(string appUserModelId, string arguments = null)
         {
             var process = WindowsStoreAppLauncher.Launch(appUserModelId, arguments);
@@ -234,15 +285,17 @@ namespace FlaUI.Core
         public bool WaitWhileMainHandleIsMissing(TimeSpan? waitTimeout = null)
         {
             var waitTime = waitTimeout ?? TimeSpan.FromMilliseconds(-1);
-            return Retry.While(() =>
+            return Retry.WhileTrue(() =>
             {
-                _process.Refresh();
+                int processId = _process.Id;
+                _process.Dispose();
+                _process = FindProcess(processId);
                 return _process.MainWindowHandle == IntPtr.Zero;
-            }, waitTime, TimeSpan.FromMilliseconds(50));
+            }, waitTime, TimeSpan.FromMilliseconds(50)).Result;
         }
 
         /// <summary>
-        /// Gets the main window of the application's process.
+        /// Gets the main window of the applications process.
         /// </summary>
         /// <param name="automation">The automation object to use.</param>
         /// <param name="waitTimeout">An optional timeout. If null is passed, the timeout is infinite.</param>

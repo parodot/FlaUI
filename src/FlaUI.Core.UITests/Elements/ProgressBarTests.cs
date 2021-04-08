@@ -37,7 +37,7 @@ namespace FlaUI.Core.UITests.Elements
 
         private ProgressBar GetProgressBar()
         {
-            var mainWindow = App.GetMainWindow(Automation);
+            var mainWindow = Application.GetMainWindow(Automation);
             var element = mainWindow.FindFirstDescendant(cf => cf.ByAutomationId("ProgressBar")).AsProgressBar();
             return element;
         }

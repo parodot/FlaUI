@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Xml;
 using System.Xml.XPath;
-using FlaUI.Core.AutomationElements.Infrastructure;
-#if NET35
-using FlaUI.Core.Tools;
-#endif
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
 
 namespace FlaUI.Core
 {
@@ -20,6 +18,10 @@ namespace FlaUI.Core
         private AutomationElement _currentElement;
         private int _attributeIndex = NoAttributeValue;
 
+        /// <summary>
+        /// Creates a new XPath navigator which uses the given element as the root.
+        /// </summary>
+        /// <param name="rootElement">The element to use as root element.</param>
         public AutomationElementXPathNavigator(AutomationElement rootElement)
         {
             _treeWalker = rootElement.Automation.TreeWalkerFactory.GetControlViewWalker();
@@ -56,7 +58,21 @@ namespace FlaUI.Core
         }
 
         /// <inheritdoc />
-        public override string LocalName => IsInAttribute ? GetAttributeName(_attributeIndex) : _currentElement.Properties.ControlType.Value.ToString();
+        public override string LocalName
+        {
+            get
+            {
+                if (IsInAttribute)
+                {
+                    return GetAttributeName(_attributeIndex);
+                }
+                // Map unknown types to custom so they are at least findable
+                var controlType = _currentElement.Properties.ControlType.IsSupported
+                    ? _currentElement.Properties.ControlType.Value
+                    : ControlType.Custom;
+                return controlType.ToString();
+            }
+        }
 
         /// <inheritdoc />
         public override string Name => LocalName;
@@ -257,13 +273,29 @@ namespace FlaUI.Core
             switch ((ElementAttributes)attributeIndex)
             {
                 case ElementAttributes.AutomationId:
-                    return _currentElement.Properties.AutomationId.Value;
+                    return _currentElement.Properties.AutomationId.ValueOrDefault;
                 case ElementAttributes.Name:
-                    return _currentElement.Properties.Name.Value;
+                    return _currentElement.Properties.Name.ValueOrDefault;
                 case ElementAttributes.ClassName:
-                    return _currentElement.Properties.ClassName.Value;
+                    return _currentElement.Properties.ClassName.ValueOrDefault;
                 case ElementAttributes.HelpText:
-                    return _currentElement.Properties.HelpText.Value;
+                    return _currentElement.Properties.HelpText.ValueOrDefault;
+                case ElementAttributes.IsPassword:
+                    return _currentElement.Properties.IsPassword.ValueOrDefault.ToString().ToLower();
+                case ElementAttributes.FullDescription:
+                    return _currentElement.Properties.FullDescription.ValueOrDefault;
+                case ElementAttributes.ItemType:
+                    return _currentElement.Properties.ItemType.ValueOrDefault;
+                case ElementAttributes.AcceleratorKey:
+                    return _currentElement.Properties.AcceleratorKey.ValueOrDefault;
+                case ElementAttributes.AccessKey:
+                    return _currentElement.Properties.AccessKey.ValueOrDefault;
+                case ElementAttributes.IsEnabled:
+                    return _currentElement.Properties.IsEnabled.ValueOrDefault.ToString().ToLower();
+                case ElementAttributes.IsOffscreen:
+                    return _currentElement.Properties.IsOffscreen.ValueOrDefault.ToString().ToLower();
+                case ElementAttributes.ProcessId:
+                    return _currentElement.Properties.ProcessId.ValueOrDefault.ToString();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(attributeIndex));
             }
@@ -281,11 +313,10 @@ namespace FlaUI.Core
 
         private int GetAttributeIndexFromName(string attributeName)
         {
-            ElementAttributes parsedValue;
 #if NET35
-            if (ExtensionMethods.TryParse(attributeName, out parsedValue))
+            if (EnumExtensions.TryParse(attributeName, out ElementAttributes parsedValue))
 #else
-            if (Enum.TryParse(attributeName, out parsedValue))
+            if (Enum.TryParse(attributeName, out ElementAttributes parsedValue))
 #endif
             {
                 return (int)parsedValue;
@@ -298,7 +329,15 @@ namespace FlaUI.Core
             AutomationId,
             Name,
             ClassName,
-            HelpText
+            HelpText,
+            IsPassword,
+            FullDescription,
+            ItemType,
+            AcceleratorKey,
+            AccessKey,
+            IsEnabled,
+            IsOffscreen,
+            ProcessId
         }
     }
 }

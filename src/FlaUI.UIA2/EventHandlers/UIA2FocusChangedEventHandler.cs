@@ -1,14 +1,17 @@
 ﻿using System;
 using FlaUI.Core;
-using FlaUI.Core.AutomationElements.Infrastructure;
+using FlaUI.Core.AutomationElements;
 using FlaUI.Core.EventHandlers;
 using UIA = System.Windows.Automation;
 
 namespace FlaUI.UIA2.EventHandlers
 {
+    /// <summary>
+    /// UIA2 implementation of a focus changed event handler.
+    /// </summary>
     public class UIA2FocusChangedEventHandler : FocusChangedEventHandlerBase
     {
-        public UIA.AutomationFocusChangedEventHandler EventHandler { get; private set; }
+        public UIA.AutomationFocusChangedEventHandler EventHandler { get; }
 
         public UIA2FocusChangedEventHandler(AutomationBase automation, Action<AutomationElement> callAction) : base(automation, callAction)
         {

@@ -28,10 +28,12 @@ namespace FlaUI.UIA3
         public PropertyId FrameworkId => AutomationObjectIds.FrameworkIdProperty;
         public PropertyId FullDescription => AutomationObjectIds.FullDescriptionProperty;
         public PropertyId HasKeyboardFocus => AutomationObjectIds.HasKeyboardFocusProperty;
+        public PropertyId HeadingLevel => AutomationObjectIds.HeadingLevelProperty;
         public PropertyId HelpText => AutomationObjectIds.HelpTextProperty;
         public PropertyId IsContentElement => AutomationObjectIds.IsContentElementProperty;
         public PropertyId IsControlElement => AutomationObjectIds.IsControlElementProperty;
         public PropertyId IsDataValidForForm => AutomationObjectIds.IsDataValidForFormProperty;
+        public PropertyId IsDialog => AutomationObjectIds.IsDialogProperty;
         public PropertyId IsEnabled => AutomationObjectIds.IsEnabledProperty;
         public PropertyId IsKeyboardFocusable => AutomationObjectIds.IsKeyboardFocusableProperty;
         public PropertyId IsOffscreen => AutomationObjectIds.IsOffscreenProperty;
@@ -40,7 +42,7 @@ namespace FlaUI.UIA3
         public PropertyId IsRequiredForForm => AutomationObjectIds.IsRequiredForFormProperty;
         public PropertyId ItemStatus => AutomationObjectIds.ItemStatusProperty;
         public PropertyId ItemType => AutomationObjectIds.ItemTypeProperty;
-        public PropertyId LabeledBy => AutomationObjectIds.AcceleratorKeyProperty;
+        public PropertyId LabeledBy => AutomationObjectIds.LabeledByProperty;
         public PropertyId LandmarkType => AutomationObjectIds.LandmarkTypeProperty;
         public PropertyId Level => AutomationObjectIds.LevelProperty;
         public PropertyId LiveSetting => AutomationObjectIds.LiveSettingProperty;

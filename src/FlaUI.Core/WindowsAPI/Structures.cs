@@ -37,6 +37,7 @@ namespace FlaUI.Core.WindowsAPI
             return new COLORREF(c.R, c.G, c.B);
         }
 
+#if NETFRAMEWORK
         public static implicit operator System.Windows.Media.Color(COLORREF c)
         {
             return System.Windows.Media.Color.FromRgb(c.R, c.G, c.B);
@@ -46,6 +47,7 @@ namespace FlaUI.Core.WindowsAPI
         {
             return new COLORREF(c.R, c.G, c.B);
         }
+#endif
 
         public override string ToString()
         {
@@ -114,6 +116,81 @@ namespace FlaUI.Core.WindowsAPI
         public uint uMsg;
         public ushort wParamL;
         public ushort wParamH;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CURSORINFO
+    {
+        public Int32 cbSize;
+        public CursorState flags;
+        public IntPtr hCursor;
+        public POINT ptScreenPos;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ICONINFO
+    {
+        public bool fIcon;
+        public int xHotspot;
+        public int yHotspot;
+        public IntPtr hbmMask;
+        public IntPtr hbmColor;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
+
+        public override string ToString()
+        {
+            return $"{{X={left},Y={top},Width={right - left},Height={bottom - top}}}";
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MonitorInfo
+    {
+        public uint size;
+        public RECT monitor;
+        public RECT work;
+        public uint flags;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINTER_TOUCH_INFO
+    {
+        public POINTER_INFO pointerInfo;
+        public TouchFlags touchFlags;
+        public TouchMask touchMask;
+        public RECT rcContact;
+        public RECT rcContactRaw;
+        public uint orientation;
+        public uint pressure;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINTER_INFO
+    {
+        public PointerInputType pointerType;
+        public uint pointerId;
+        public uint frameId;
+        public PointerFlags pointerFlags;
+        public IntPtr sourceDevice;
+        public IntPtr hwndTarget;
+        public POINT ptPixelLocation;
+        public POINT ptPixelLocationRaw;
+        public POINT ptHimetricLocation;
+        public POINT ptHimetricLocationRaw;
+        public uint dwTime;
+        public uint historyCount;
+        public uint inputData;
+        public uint dwKeyStates;
+        public ulong PerformanceCount;
+        public PointerButtonChangeType ButtonChangeType;
     }
 }
 #pragma warning restore

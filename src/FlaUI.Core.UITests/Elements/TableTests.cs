@@ -1,5 +1,4 @@
 ﻿using FlaUI.Core.AutomationElements;
-using FlaUI.Core.AutomationElements.Infrastructure;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.UITests.TestFramework;
 using NUnit.Framework;
@@ -22,7 +21,7 @@ namespace FlaUI.Core.UITests.Elements
         [OneTimeSetUp]
         public void SelectTab()
         {
-            var mainWindow = App.GetMainWindow(Automation);
+            var mainWindow = Application.GetMainWindow(Automation);
             var tab = mainWindow.FindFirstDescendant(cf => cf.ByControlType(ControlType.Tab)).AsTab();
             tab.SelectTabItem(1);
             var table = mainWindow.FindFirstDescendant(cf => cf.ByAutomationId("listView1")).AsGrid();

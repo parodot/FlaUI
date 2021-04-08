@@ -1,35 +1,34 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using FlaUI.Core.AutomationElements;
-using FlaUI.Core.AutomationElements.Infrastructure;
 using FlaUI.Core.Input;
-using FlaUI.Core.Tools;
-using FlaUI.Core.UITests.TestFramework;
 using FlaUI.Core.WindowsAPI;
+using FlaUI.TestUtilities;
+using FlaUI.UIA3;
 using NUnit.Framework;
 using OperatingSystem = FlaUI.Core.Tools.OperatingSystem;
 
 namespace FlaUI.Core.UITests
 {
     [TestFixture]
-    public class CalculatorTests : UITestBase
+    public class CalculatorTests : FlaUITestBase
     {
-        public CalculatorTests()
-            : base(AutomationType.UIA3, TestApplicationType.Custom)
+        protected override AutomationBase GetAutomation()
         {
+            return new UIA3Automation();
         }
 
         [Test]
         public void CalculatorTest()
         {
-            var window = App.GetMainWindow(Automation);
+            var window = Application.GetMainWindow(Automation);
             var calc = OperatingSystem.IsWindows10() ? (ICalculator)new Win10Calc(window) : new LegacyCalc(window);
 
             // Switch to default mode
             System.Threading.Thread.Sleep(1000);
             Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.KEY_1);
             Wait.UntilInputIsProcessed();
-            App.WaitWhileBusy();
+            Application.WaitWhileBusy();
             System.Threading.Thread.Sleep(1000);
 
             // Simple addition
@@ -43,7 +42,7 @@ namespace FlaUI.Core.UITests
             calc.Button7.Click();
             calc.Button8.Click();
             calc.ButtonEquals.Click();
-            App.WaitWhileBusy();
+            Application.WaitWhileBusy();
             var result = calc.Result;
             Assert.That(result, Is.EqualTo("6912"));
 
@@ -61,7 +60,7 @@ namespace FlaUI.Core.UITests
                 // Use the store application on those systems
                 return Application.LaunchStoreApp("Microsoft.WindowsCalculator_8wekyb3d8bbwe!App");
             }
-            if (OperatingSystem.IsWindowsServer2016())
+            if (OperatingSystem.IsWindowsServer2016() || OperatingSystem.IsWindowsServer2019())
             {
                 // The calc.exe on this system is just a stub which launches win32calc.exe
                 return Application.Launch("win32calc.exe");

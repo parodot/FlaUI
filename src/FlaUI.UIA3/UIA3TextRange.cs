@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Drawing;
 using FlaUI.Core;
-using FlaUI.Core.AutomationElements.Infrastructure;
+using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Identifiers;
-using FlaUI.Core.Shapes;
 using FlaUI.Core.Tools;
 using FlaUI.UIA3.Converters;
 using UIA = Interop.UIAutomationClient;
@@ -76,13 +76,13 @@ namespace FlaUI.UIA3
             {
                 return null;
             }
-            // If unrolledRects is somehow not a multiple of 4, we still will not 
+            // If unrolledRects is somehow not a multiple of 4, we still will not
             // overrun it, since (x / 4) * 4 <= x for C# integer math.
             var result = new Rectangle[unrolledRects.Length / 4];
             for (var i = 0; i < result.Length; i++)
             {
                 var j = i * 4;
-                result[i] = new Rectangle(unrolledRects[j], unrolledRects[j + 1], unrolledRects[j + 2], unrolledRects[j + 3]);
+                result[i] = new Rectangle(unrolledRects[j].ToInt(), unrolledRects[j + 1].ToInt(), unrolledRects[j + 2].ToInt(), unrolledRects[j + 3].ToInt());
             }
             return result;
         }
@@ -139,6 +139,12 @@ namespace FlaUI.UIA3
         {
             var nativeRange2 = (UIA.IUIAutomationTextRange2)NativeRange;
             return TextRangeConverter.NativeToManaged(Automation, nativeRange2);
+        }
+
+        public UIA3TextRange3 AsTextRange3()
+        {
+            var nativeRange3 = (UIA.IUIAutomationTextRange3)NativeRange;
+            return TextRangeConverter.NativeToManaged(Automation, nativeRange3);
         }
 
         protected UIA.IUIAutomationTextRange ToNativeRange(ITextRange range)

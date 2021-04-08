@@ -1,4 +1,5 @@
-﻿using FlaUI.Core.Input;
+﻿using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Input;
 using FlaUI.Core.UITests.TestFramework;
 using NUnit.Framework;
 
@@ -16,7 +17,7 @@ namespace FlaUI.Core.UITests.Elements
         [Test]
         public void CheckBoxInPopupTest()
         {
-            var window = App.GetMainWindow(Automation);
+            var window = Application.GetMainWindow(Automation);
             var btn = window.FindFirstDescendant(cf => cf.ByAutomationId("PopupToggleButton1"));
             btn.Click();
             Wait.UntilInputIsProcessed();
@@ -31,7 +32,7 @@ namespace FlaUI.Core.UITests.Elements
         [Test]
         public void MenuInPopupTest()
         {
-            var window = App.GetMainWindow(Automation);
+            var window = Application.GetMainWindow(Automation);
             var btn = window.FindFirstDescendant(cf => cf.ByAutomationId("PopupToggleButton2"));
             btn.Click();
             Wait.UntilInputIsProcessed();

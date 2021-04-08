@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 // ReSharper disable InconsistentNaming
 #pragma warning disable
@@ -379,13 +380,507 @@ namespace FlaUI.Core.WindowsAPI
     public enum SystemMetric
     {
         /// <summary>
+        /// The flags that specify how the system arranged minimized windows. For more information, see the Remarks section in this topic.
+        /// </summary>
+        SM_ARRANGE = 56,
+
+        /// <summary>
+        /// The value that specifies how the system is started:
+        /// 0 Normal boot
+        /// 1 Fail-safe boot
+        /// 2 Fail-safe with network boot
+        /// A fail-safe boot (also called SafeBoot, Safe Mode, or Clean Boot) bypasses the user startup files.
+        /// </summary>
+        SM_CLEANBOOT = 67,
+
+        /// <summary>
+        /// The number of display monitors on a desktop. For more information, see the Remarks section in this topic.
+        /// </summary>
+        SM_CMONITORS = 80,
+
+        /// <summary>
+        /// The number of buttons on a mouse, or zero if no mouse is installed.
+        /// </summary>
+        SM_CMOUSEBUTTONS = 43,
+
+        /// <summary>
+        /// Reflects the state of the laptop or slate mode, 0 for Slate Mode and non-zero otherwise. When this system metric changes, the system sends a broadcast message via WM_SETTINGCHANGE with "ConvertibleSlateMode" in the LPARAM. Note that this system metric doesn't apply to desktop PCs. In that case, use GetAutoRotationState.
+        /// </summary>
+        SM_CONVERTIBLESLATEMODE = 0x2003,
+
+        /// <summary>
+        /// The width of a window border, in pixels. This is equivalent to the SM_CXEDGE value for windows with the 3-D look.
+        /// </summary>
+        SM_CXBORDER = 5,
+
+        /// <summary>
+        /// The width of a cursor, in pixels. The system cannot create cursors of other sizes.
+        /// </summary>
+        SM_CXCURSOR = 13,
+
+        /// <summary>
+        /// This value is the same as SM_CXFIXEDFRAME.
+        /// </summary>
+        SM_CXDLGFRAME = 7,
+
+        /// <summary>
+        /// The width of the rectangle around the location of a first click in a double-click sequence, in pixels. The second click must occur within the rectangle that is defined by SM_CXDOUBLECLK and SM_CYDOUBLECLK for the system to consider the two clicks a double-click. The two clicks must also occur within a specified time.
+        /// To set the width of the double-click rectangle, call SystemParametersInfo with SPI_SETDOUBLECLKWIDTH.
+
+        /// </summary>
+        SM_CXDOUBLECLK = 36,
+
+        /// <summary>
+        /// The number of pixels on either side of a mouse-down point that the mouse pointer can move before a drag operation begins. This allows the user to click and release the mouse button easily without unintentionally starting a drag operation. If this value is negative, it is subtracted from the left of the mouse-down point and added to the right of it.
+        /// </summary>
+        SM_CXDRAG = 68,
+
+        /// <summary>
+        /// The width of a 3-D border, in pixels. This metric is the 3-D counterpart of SM_CXBORDER.
+        /// </summary>
+        SM_CXEDGE = 45,
+
+        /// <summary>
+        /// The thickness of the frame around the perimeter of a window that has a caption but is not sizable, in pixels. SM_CXFIXEDFRAME is the height of the horizontal border, and SM_CYFIXEDFRAME is the width of the vertical border.
+        /// This value is the same as SM_CXDLGFRAME.
+
+        /// </summary>
+        SM_CXFIXEDFRAME = 7,
+
+        /// <summary>
+        /// The width of the left and right edges of the focus rectangle that the DrawFocusRect draws. This value is in pixels.
+        /// Windows 2000:  This value is not supported.
+
+        /// </summary>
+        SM_CXFOCUSBORDER = 83,
+
+        /// <summary>
+        /// This value is the same as SM_CXSIZEFRAME.
+        /// </summary>
+        SM_CXFRAME = 32,
+
+        /// <summary>
+        /// The width of the client area for a full-screen window on the primary display monitor, in pixels. To get the coordinates of the portion of the screen that is not obscured by the system taskbar or by application desktop toolbars, call the SystemParametersInfo function with the SPI_GETWORKAREA value.
+        /// </summary>
+        SM_CXFULLSCREEN = 16,
+
+        /// <summary>
+        /// The width of the arrow bitmap on a horizontal scroll bar, in pixels.
+        /// </summary>
+        SM_CXHSCROLL = 21,
+
+        /// <summary>
+        /// The width of the thumb box in a horizontal scroll bar, in pixels.
+        /// </summary>
+        SM_CXHTHUMB = 10,
+
+        /// <summary>
+        /// The default width of an icon, in pixels. The LoadIcon function can load only icons with the dimensions that SM_CXICON and SM_CYICON specifies.
+        /// </summary>
+        SM_CXICON = 11,
+
+        /// <summary>
+        /// The width of a grid cell for items in large icon view, in pixels. Each item fits into a rectangle of size SM_CXICONSPACING by SM_CYICONSPACING when arranged. This value is always greater than or equal to SM_CXICON.
+        /// </summary>
+        SM_CXICONSPACING = 38,
+
+        /// <summary>
+        /// The default width, in pixels, of a maximized top-level window on the primary display monitor.
+        /// </summary>
+        SM_CXMAXIMIZED = 61,
+
+        /// <summary>
+        /// The default maximum width of a window that has a caption and sizing borders, in pixels. This metric refers to the entire desktop. The user cannot drag the window frame to a size larger than these dimensions. A window can override this value by processing the WM_GETMINMAXINFO message.
+        /// </summary>
+        SM_CXMAXTRACK = 59,
+
+        /// <summary>
+        /// The width of the default menu check-mark bitmap, in pixels.
+        /// </summary>
+        SM_CXMENUCHECK = 71,
+
+        /// <summary>
+        /// The width of menu bar buttons, such as the child window close button that is used in the multiple document interface, in pixels.
+        /// </summary>
+        SM_CXMENUSIZE = 54,
+
+        /// <summary>
+        /// The minimum width of a window, in pixels.
+        /// </summary>
+        SM_CXMIN = 28,
+
+        /// <summary>
+        /// The width of a minimized window, in pixels.
+        /// </summary>
+        SM_CXMINIMIZED = 57,
+
+        /// <summary>
+        /// The width of a grid cell for a minimized window, in pixels. Each minimized window fits into a rectangle this size when arranged. This value is always greater than or equal to SM_CXMINIMIZED.
+        /// </summary>
+        SM_CXMINSPACING = 47,
+
+        /// <summary>
+        /// The minimum tracking width of a window, in pixels. The user cannot drag the window frame to a size smaller than these dimensions. A window can override this value by processing the WM_GETMINMAXINFO message.
+        /// </summary>
+        SM_CXMINTRACK = 34,
+
+        /// <summary>
+        /// The amount of border padding for captioned windows, in pixels.
+        /// Windows XP/2000:  This value is not supported.
+
+        /// </summary>
+        SM_CXPADDEDBORDER = 92,
+
+        /// <summary>
+        /// The width of the screen of the primary display monitor, in pixels. This is the same value obtained by calling GetDeviceCaps as follows: GetDeviceCaps( hdcPrimaryMonitor, HORZRES).
+        /// </summary>
+        SM_CXSCREEN = 0,
+
+        /// <summary>
+        /// The width of a button in a window caption or title bar, in pixels.
+        /// </summary>
+        SM_CXSIZE = 30,
+
+        /// <summary>
+        /// The thickness of the sizing border around the perimeter of a window that can be resized, in pixels. SM_CXSIZEFRAME is the width of the horizontal border, and SM_CYSIZEFRAME is the height of the vertical border.
+        /// This value is the same as SM_CXFRAME.
+
+        /// </summary>
+        SM_CXSIZEFRAME = 32,
+
+        /// <summary>
+        /// The recommended width of a small icon, in pixels. Small icons typically appear in window captions and in small icon view.
+        /// </summary>
+        SM_CXSMICON = 49,
+
+        /// <summary>
+        /// The width of small caption buttons, in pixels.
+        /// </summary>
+        SM_CXSMSIZE = 52,
+
+        /// <summary>
+        /// The width of the virtual screen, in pixels. The virtual screen is the bounding rectangle of all display monitors. The SM_XVIRTUALSCREEN metric is the coordinates for the left side of the virtual screen.
+        /// </summary>
+        SM_CXVIRTUALSCREEN = 78,
+
+        /// <summary>
+        /// The width of a vertical scroll bar, in pixels.
+        /// </summary>
+        SM_CXVSCROLL = 2,
+
+        /// <summary>
+        /// The height of a window border, in pixels. This is equivalent to the SM_CYEDGE value for windows with the 3-D look.
+        /// </summary>
+        SM_CYBORDER = 6,
+
+        /// <summary>
+        /// The height of a caption area, in pixels.
+        /// </summary>
+        SM_CYCAPTION = 4,
+
+        /// <summary>
+        /// The height of a cursor, in pixels. The system cannot create cursors of other sizes.
+        /// </summary>
+        SM_CYCURSOR = 14,
+
+        /// <summary>
+        /// This value is the same as SM_CYFIXEDFRAME.
+        /// </summary>
+        SM_CYDLGFRAME = 8,
+
+        /// <summary>
+        /// The height of the rectangle around the location of a first click in a double-click sequence, in pixels. The second click must occur within the rectangle defined by SM_CXDOUBLECLK and SM_CYDOUBLECLK for the system to consider the two clicks a double-click. The two clicks must also occur within a specified time.
+        /// To set the height of the double-click rectangle, call SystemParametersInfo with SPI_SETDOUBLECLKHEIGHT.
+
+        /// </summary>
+        SM_CYDOUBLECLK = 37,
+
+        /// <summary>
+        /// The number of pixels above and below a mouse-down point that the mouse pointer can move before a drag operation begins. This allows the user to click and release the mouse button easily without unintentionally starting a drag operation. If this value is negative, it is subtracted from above the mouse-down point and added below it.
+        /// </summary>
+        SM_CYDRAG = 69,
+
+        /// <summary>
+        /// The height of a 3-D border, in pixels. This is the 3-D counterpart of SM_CYBORDER.
+        /// </summary>
+        SM_CYEDGE = 46,
+
+        /// <summary>
+        /// The thickness of the frame around the perimeter of a window that has a caption but is not sizable, in pixels. SM_CXFIXEDFRAME is the height of the horizontal border, and SM_CYFIXEDFRAME is the width of the vertical border.
+        /// This value is the same as SM_CYDLGFRAME.
+
+        /// </summary>
+        SM_CYFIXEDFRAME = 8,
+
+        /// <summary>
+        /// The height of the top and bottom edges of the focus rectangle drawn by DrawFocusRect. This value is in pixels.
+        /// Windows 2000:  This value is not supported.
+
+        /// </summary>
+        SM_CYFOCUSBORDER = 84,
+
+        /// <summary>
+        /// This value is the same as SM_CYSIZEFRAME.
+        /// </summary>
+        SM_CYFRAME = 33,
+
+        /// <summary>
+        /// The height of the client area for a full-screen window on the primary display monitor, in pixels. To get the coordinates of the portion of the screen not obscured by the system taskbar or by application desktop toolbars, call the SystemParametersInfo function with the SPI_GETWORKAREA value.
+        /// </summary>
+        SM_CYFULLSCREEN = 17,
+
+        /// <summary>
+        /// The height of a horizontal scroll bar, in pixels.
+        /// </summary>
+        SM_CYHSCROLL = 3,
+
+        /// <summary>
+        /// The default height of an icon, in pixels. The LoadIcon function can load only icons with the dimensions SM_CXICON and SM_CYICON.
+        /// </summary>
+        SM_CYICON = 12,
+
+        /// <summary>
+        /// The height of a grid cell for items in large icon view, in pixels. Each item fits into a rectangle of size SM_CXICONSPACING by SM_CYICONSPACING when arranged. This value is always greater than or equal to SM_CYICON.
+        /// </summary>
+        SM_CYICONSPACING = 39,
+
+        /// <summary>
+        /// For double byte character set versions of the system, this is the height of the Kanji window at the bottom of the screen, in pixels.
+        /// </summary>
+        SM_CYKANJIWINDOW = 18,
+
+        /// <summary>
+        /// The default height, in pixels, of a maximized top-level window on the primary display monitor.
+        /// </summary>
+        SM_CYMAXIMIZED = 62,
+
+        /// <summary>
+        /// The default maximum height of a window that has a caption and sizing borders, in pixels. This metric refers to the entire desktop. The user cannot drag the window frame to a size larger than these dimensions. A window can override this value by processing the WM_GETMINMAXINFO message.
+        /// </summary>
+        SM_CYMAXTRACK = 60,
+
+        /// <summary>
+        /// The height of a single-line menu bar, in pixels.
+        /// </summary>
+        SM_CYMENU = 15,
+
+        /// <summary>
+        /// The height of the default menu check-mark bitmap, in pixels.
+        /// </summary>
+        SM_CYMENUCHECK = 72,
+
+        /// <summary>
+        /// The height of menu bar buttons, such as the child window close button that is used in the multiple document interface, in pixels.
+        /// </summary>
+        SM_CYMENUSIZE = 55,
+
+        /// <summary>
+        /// The minimum height of a window, in pixels.
+        /// </summary>
+        SM_CYMIN = 29,
+
+        /// <summary>
+        /// The height of a minimized window, in pixels.
+        /// </summary>
+        SM_CYMINIMIZED = 58,
+
+        /// <summary>
+        /// The height of a grid cell for a minimized window, in pixels. Each minimized window fits into a rectangle this size when arranged. This value is always greater than or equal to SM_CYMINIMIZED.
+        /// </summary>
+        SM_CYMINSPACING = 48,
+
+        /// <summary>
+        /// The minimum tracking height of a window, in pixels. The user cannot drag the window frame to a size smaller than these dimensions. A window can override this value by processing the WM_GETMINMAXINFO message.
+        /// </summary>
+        SM_CYMINTRACK = 35,
+
+        /// <summary>
+        /// The height of the screen of the primary display monitor, in pixels. This is the same value obtained by calling GetDeviceCaps as follows: GetDeviceCaps( hdcPrimaryMonitor, VERTRES).
+        /// </summary>
+        SM_CYSCREEN = 1,
+
+        /// <summary>
+        /// The height of a button in a window caption or title bar, in pixels.
+        /// </summary>
+        SM_CYSIZE = 31,
+
+        /// <summary>
+        /// The thickness of the sizing border around the perimeter of a window that can be resized, in pixels. SM_CXSIZEFRAME is the width of the horizontal border, and SM_CYSIZEFRAME is the height of the vertical border.
+        /// This value is the same as SM_CYFRAME.
+
+        /// </summary>
+        SM_CYSIZEFRAME = 33,
+
+        /// <summary>
+        /// The height of a small caption, in pixels.
+        /// </summary>
+        SM_CYSMCAPTION = 51,
+
+        /// <summary>
+        /// The recommended height of a small icon, in pixels. Small icons typically appear in window captions and in small icon view.
+        /// </summary>
+        SM_CYSMICON = 50,
+
+        /// <summary>
+        /// The height of small caption buttons, in pixels.
+        /// </summary>
+        SM_CYSMSIZE = 53,
+
+        /// <summary>
+        /// The height of the virtual screen, in pixels. The virtual screen is the bounding rectangle of all display monitors. The SM_YVIRTUALSCREEN metric is the coordinates for the top of the virtual screen.
+        /// </summary>
+        SM_CYVIRTUALSCREEN = 79,
+
+        /// <summary>
+        /// The height of the arrow bitmap on a vertical scroll bar, in pixels.
+        /// </summary>
+        SM_CYVSCROLL = 20,
+
+        /// <summary>
+        /// The height of the thumb box in a vertical scroll bar, in pixels.
+        /// </summary>
+        SM_CYVTHUMB = 9,
+
+        /// <summary>
+        /// Nonzero if User32.dll supports DBCS; otherwise, 0.
+        /// </summary>
+        SM_DBCSENABLED = 42,
+
+        /// <summary>
+        /// Nonzero if the debug version of User.exe is installed; otherwise, 0.
+        /// </summary>
+        SM_DEBUG = 22,
+
+        /// <summary>
+        /// Nonzero if the current operating system is Windows 7 or Windows Server 2008 R2 and the Tablet PC Input service is started; otherwise, 0. The return value is a bitmask that specifies the type of digitizer input supported by the device. For more information, see Remarks.
+        /// Windows Server 2008, Windows Vista and Windows XP/2000:  This value is not supported.
+        /// </summary>
+        SM_DIGITIZER = 94,
+
+        /// <summary>
+        /// Nonzero if Input Method Manager/Input Method Editor features are enabled; otherwise, 0.
+        /// SM_IMMENABLED indicates whether the system is ready to use a Unicode-based IME on a Unicode application. To ensure that a language-dependent IME works, check SM_DBCSENABLED and the system ANSI code page. Otherwise the ANSI-to-Unicode conversion may not be performed correctly, or some components like fonts or registry settings may not be present.
+        /// </summary>
+        SM_IMMENABLED = 82,
+
+        /// <summary>
+        /// Nonzero if there are digitizers in the system; otherwise, 0.
+        /// SM_MAXIMUMTOUCHES returns the aggregate maximum of the maximum number of contacts supported by every digitizer in the system. If the system has only single-touch digitizers, the return value is 1. If the system has multi-touch digitizers, the return value is the number of simultaneous contacts the hardware can provide.
+        /// Windows Server 2008, Windows Vista and Windows XP/2000:  This value is not supported.
+        /// </summary>
+        SM_MAXIMUMTOUCHES = 95,
+
+        /// <summary>
+        /// Nonzero if the current operating system is the Windows XP, Media Center Edition, 0 if not.
+        /// </summary>
+        SM_MEDIACENTER = 87,
+
+        /// <summary>
+        /// Nonzero if drop-down menus are right-aligned with the corresponding menu-bar item; 0 if the menus are left-aligned.
+        /// </summary>
+        SM_MENUDROPALIGNMENT = 40,
+
+        /// <summary>
+        /// Nonzero if the system is enabled for Hebrew and Arabic languages, 0 if not.
+        /// </summary>
+        SM_MIDEASTENABLED = 74,
+
+        /// <summary>
+        /// Nonzero if a mouse is installed; otherwise, 0. This value is rarely zero, because of support for virtual mice and because some systems detect the presence of the port instead of the presence of a mouse.
+        /// </summary>
+        SM_MOUSEPRESENT = 19,
+
+        /// <summary>
+        /// Nonzero if a mouse with a horizontal scroll wheel is installed; otherwise 0.
+        /// </summary>
+        SM_MOUSEHORIZONTALWHEELPRESENT = 91,
+
+        /// <summary>
+        /// Nonzero if a mouse with a vertical scroll wheel is installed; otherwise 0.
+        /// </summary>
+        SM_MOUSEWHEELPRESENT = 75,
+
+        /// <summary>
+        /// The least significant bit is set if a network is present; otherwise, it is cleared. The other bits are reserved for future use.
+        /// </summary>
+        SM_NETWORK = 63,
+
+        /// <summary>
+        /// Nonzero if the Microsoft Windows for Pen computing extensions are installed; zero otherwise.
+        /// </summary>
+        SM_PENWINDOWS = 41,
+
+        /// <summary>
+        /// This system metric is used in a Terminal Services environment to determine if the current Terminal Server session is being remotely controlled. Its value is nonzero if the current session is remotely controlled; otherwise, 0.
+        /// You can use terminal services management tools such as Terminal Services Manager (tsadmin.msc) and shadow.exe to control a remote session. When a session is being remotely controlled, another user can view the contents of that session and potentially interact with it.
+        /// </summary>
+        SM_REMOTECONTROL = 0x2001,
+
+        /// <summary>
+        /// This system metric is used in a Terminal Services environment. If the calling process is associated with a Terminal Services client session, the return value is nonzero. If the calling process is associated with the Terminal Services console session, the return value is 0. Windows Server 2003 and Windows XP:  The console session is not necessarily the physical console. For more information, see WTSGetActiveConsoleSessionId.
+        /// </summary>
+        SM_REMOTESESSION = 0x1000,
+
+        /// <summary>
+        /// Nonzero if all the display monitors have the same color format, otherwise, 0. Two displays can have the same bit depth, but different color formats. For example, the red, green, and blue pixels can be encoded with different numbers of bits, or those bits can be located in different places in a pixel color value.
+        /// </summary>
+        SM_SAMEDISPLAYFORMAT = 81,
+
+        /// <summary>
+        /// This system metric should be ignored; it always returns 0.
+        /// </summary>
+        SM_SECURE = 44,
+
+        /// <summary>
+        /// The build number if the system is Windows Server 2003 R2; otherwise, 0.
+        /// </summary>
+        SM_SERVERR2 = 89,
+
+        /// <summary>
+        /// Nonzero if the user requires an application to present information visually in situations where it would otherwise present the information only in audible form; otherwise, 0.
+        /// </summary>
+        SM_SHOWSOUNDS = 70,
+
+        /// <summary>
+        /// Nonzero if the current session is shutting down; otherwise, 0.
+        /// Windows 2000:  This value is not supported.
+        /// </summary>
+        SM_SHUTTINGDOWN = 0x2000,
+
+        /// <summary>
+        /// Nonzero if the computer has a low-end (slow) processor; otherwise, 0.
+        /// </summary>
+        SM_SLOWMACHINE = 73,
+
+        /// <summary>
+        /// Nonzero if the current operating system is Windows 7 Starter Edition, Windows Vista Starter, or Windows XP Starter Edition; otherwise, 0.
+        /// </summary>
+        SM_STARTER = 88,
+
+        /// <summary>
         /// Nonzero if the meanings of the left and right mouse buttons are swapped; otherwise, 0.
         /// </summary>
         SM_SWAPBUTTON = 23,
+
+        /// <summary>
+        /// Reflects the state of the docking mode, 0 for Undocked Mode and non-zero otherwise. When this system metric changes, the system sends a broadcast message via WM_SETTINGCHANGE with "SystemDockMode" in the LPARAM.
+        /// </summary>
+        SM_SYSTEMDOCKED = 0x2004,
+
+        /// <summary>
+        /// Nonzero if the current operating system is the Windows XP Tablet PC edition or if the current operating system is Windows Vista or Windows 7 and the Tablet PC Input service is started; otherwise, 0. The SM_DIGITIZER setting indicates the type of digitizer input supported by a device running Windows 7 or Windows Server 2008 R2. For more information, see Remarks.
+        /// </summary>
+        SM_TABLETPC = 86,
+
+        /// <summary>
+        /// The coordinates for the left side of the virtual screen. The virtual screen is the bounding rectangle of all display monitors. The SM_CXVIRTUALSCREEN metric is the width of the virtual screen.
+        /// </summary>
         SM_XVIRTUALSCREEN = 76,
-        SM_YVIRTUALSCREEN = 77,
-        SM_CXVIRTUALSCREEN = 78,
-        SM_CYVIRTUALSCREEN = 79
+
+        /// <summary>
+        /// The coordinates for the top of the virtual screen. The virtual screen is the bounding rectangle of all display monitors. The SM_CYVIRTUALSCREEN metric is the height of the virtual screen.
+        /// </summary>
+        SM_YVIRTUALSCREEN = 77
     }
 
     public enum InputType : uint
@@ -1536,6 +2031,419 @@ namespace FlaUI.Core.WindowsAPI
         ROLE_SYSTEM_WHITESPACE = 0x0000003B,
         ROLE_SYSTEM_PAGETABLIST = 0x0000003C,
         ROLE_SYSTEM_CLOCK = 0x0000003D
+    }
+
+    public enum CursorState
+    {
+        /// <summary>
+        /// The cursor is hidden.
+        /// </summary>
+        CURSOR_HIDING = 0x00000000,
+
+        /// <summary>
+        /// The cursor is showing.
+        /// </summary>
+        CURSOR_SHOWING = 0x00000001,
+
+        /// <summary>
+        /// Windows 8: The cursor is suppressed. This flag indicates that the system is not drawing
+        /// the cursor because the user is providing input through touch or pen instead of the mouse.
+        /// </summary>
+        CURSOR_SUPPRESSED = 0x00000002
+    }
+
+    public enum StretchMode
+    {
+        STRETCH_ANDSCANS = 1,
+        STRETCH_ORSCANS = 2,
+        STRETCH_DELETESCANS = 3,
+        STRETCH_HALFTONE = 4,
+    }
+
+    /// <summary>
+    /// Specifies a raster-operation code. These codes define how the color data for the
+    /// source rectangle is to be combined with the color data for the destination
+    /// rectangle to achieve the final color.
+    /// </summary>
+    public enum TernaryRasterOperations : uint
+    {
+        /// <summary>dest = source</summary>
+        SRCCOPY = 0x00CC0020,
+        /// <summary>dest = source OR dest</summary>
+        SRCPAINT = 0x00EE0086,
+        /// <summary>dest = source AND dest</summary>
+        SRCAND = 0x008800C6,
+        /// <summary>dest = source XOR dest</summary>
+        SRCINVERT = 0x00660046,
+        /// <summary>dest = source AND (NOT dest)</summary>
+        SRCERASE = 0x00440328,
+        /// <summary>dest = (NOT source)</summary>
+        NOTSRCCOPY = 0x00330008,
+        /// <summary>dest = (NOT src) AND (NOT dest)</summary>
+        NOTSRCERASE = 0x001100A6,
+        /// <summary>dest = (source AND pattern)</summary>
+        MERGECOPY = 0x00C000CA,
+        /// <summary>dest = (NOT source) OR dest</summary>
+        MERGEPAINT = 0x00BB0226,
+        /// <summary>dest = pattern</summary>
+        PATCOPY = 0x00F00021,
+        /// <summary>dest = DPSnoo</summary>
+        PATPAINT = 0x00FB0A09,
+        /// <summary>dest = pattern XOR dest</summary>
+        PATINVERT = 0x005A0049,
+        /// <summary>dest = (NOT dest)</summary>
+        DSTINVERT = 0x00550009,
+        /// <summary>dest = BLACK</summary>
+        BLACKNESS = 0x00000042,
+        /// <summary>dest = WHITE</summary>
+        WHITENESS = 0x00FF0062,
+        /// <summary>
+        /// Capture window as seen on screen. This includes layered windows
+        /// such as WPF windows with AllowsTransparency="true"
+        /// </summary>
+        CAPTUREBLT = 0x40000000
+    }
+
+    /// <summary>
+    /// Specifies the type of visual feedback displayed for the injected input type.
+    /// </summary>
+    public enum InjectedInputVisualizationMode
+    {
+        /// <summary>
+        /// Specifies default touch visualizations.
+        /// </summary>
+        DEFAULT = 0x1,
+
+        /// <summary>
+        /// Specifies indirect touch visualizations.
+        /// </summary>
+        INDIREC = 0x2,
+
+        /// <summary>
+        /// Specifies no touch visualizations.
+        /// </summary>
+        NONE = 0x3
+    }
+
+    /// <summary>
+    /// Identifies the pointer input types.
+    /// </summary>
+    public enum PointerInputType
+    {
+        /// <summary>
+        /// Generic pointer type. This type never appears in pointer messages or pointer data. Some data query functions allow the caller to restrict the query to specific pointer type.
+        /// The PT_POINTER type can be used in these functions to specify that the query is to include pointers of all types
+        /// </summary>
+        PT_POINTER = 0x00000001,
+
+        /// <summary>
+        /// Touch pointer type.
+        /// </summary>
+        PT_TOUCH = 0x00000002,
+
+        /// <summary>
+        /// Pen pointer type.
+        /// </summary>
+        PT_PEN = 0x00000003,
+
+        /// <summary>
+        /// Mouse pointer type.
+        /// </summary>
+        PT_MOUSE = 0x00000004,
+
+        /// <summary>
+        /// Touchpad pointer type (Windows 8.1 and later).
+        /// </summary>
+        PT_TOUCHPAD = 0x00000005,
+    }
+
+    /// <summary>
+    /// Values that can appear in the pointerFlags field of the POINTER_INFO structure.
+    /// </summary>
+    [Flags]
+    public enum PointerFlags
+    {
+        /// <summary>
+        /// Default.
+        /// </summary>
+        NONE = 0x00000000,
+
+        /// <summary>
+        /// Indicates the arrival of a new pointer.
+        /// </summary>
+        NEW = 0x00000001,
+
+        /// <summary>
+        /// Indicates that this pointer continues to exist. When this flag is not set, it indicates the pointer has left detection range.
+        /// This flag is typically not set only when a hovering pointer leaves detection range (POINTER_FLAG_UPDATE is set) or when a pointer in contact with a window surface leaves detection range(POINTER_FLAG_UP is set).
+        /// </summary>
+        INRANGE = 0x00000002,
+
+        /// <summary>
+        /// Indicates that this pointer is in contact with the digitizer surface. When this flag is not set, it indicates a hovering pointer.
+        /// </summary>
+        INCONTACT = 0x00000004,
+
+        /// <summary>
+        /// Indicates a primary action, analogous to a left mouse button down.
+        /// A touch pointer has this flag set when it is in contact with the digitizer surface.
+        /// A pen pointer has this flag set when it is in contact with the digitizer surface with no buttons pressed.
+        /// A mouse pointer has this flag set when the left mouse button is down.
+        /// </summary>
+        FIRSTBUTTON = 0x00000010,
+
+        /// <summary>
+        /// Indicates a secondary action, analogous to a right mouse button down.
+        /// A touch pointer does not use this flag.
+        /// A pen pointer has this flag set when it is in contact with the digitizer surface with the pen barrel button pressed.
+        /// A mouse pointer has this flag set when the right mouse button is down.
+        /// </summary>
+        SECONDBUTTON = 0x00000020,
+
+        /// <summary>
+        /// Analogous to a mouse wheel button down.
+        /// A touch pointer does not use this flag.
+        /// A pen pointer does not use this flag.
+        /// A mouse pointer has this flag set when the mouse wheel button is down.
+        /// </summary>
+        THIRDBUTTON = 0x00000040,
+
+        /// <summary>
+        /// Analogous to a first extended mouse (XButton1) button down.
+        /// A touch pointer does not use this flag.
+        /// A pen pointer does not use this flag.
+        /// A mouse pointer has this flag set when the first extended mouse(XBUTTON1) button is down.
+        /// </summary>
+        FOURTHBUTTON = 0x00000080,
+
+        /// <summary>
+        /// Analogous to a first extended mouse (XButton2) button down.
+        /// A touch pointer does not use this flag.
+        /// A pen pointer does not use this flag.
+        /// A mouse pointer has this flag set when the first extended mouse(XBUTTON2) button is down.
+        /// </summary>
+        FIFTHBUTTON = 0x00000100,
+
+        /// <summary>
+        /// Indicates that this pointer has been designated as the primary pointer. A primary pointer is a single pointer that can perform actions beyond those available to non-primary pointers.
+        /// For example, when a primary pointer makes contact with a window s surface, it may provide the window an opportunity to activate by sending it a WM_POINTERACTIVATE message.
+        /// The primary pointer is identified from all current user interactions on the system (mouse, touch, pen, and so on).
+        /// As such, the primary pointer might not be associated with your app.The first contact in a multi-touch interaction is set as the primary pointer.Once a primary pointer is identified, all contacts must be lifted before a new contact can be identified as a primary pointer.For apps that don't process pointer input, only the primary pointer's events are promoted to mouse events.
+        /// </summary>
+        PRIMARY = 0x00002000,
+
+        /// <summary>
+        /// Confidence is a suggestion from the source device about whether the pointer represents an intended or accidental interaction, which is especially relevant for PT_TOUCH pointers where an accidental interaction (such as with the palm of the hand) can trigger input. The presence of this flag indicates that the source device has high confidence that this input is part of an intended interaction.
+        /// </summary>
+        CONFIDENCE = 0x000004000,
+
+        /// <summary>
+        /// Indicates that the pointer is departing in an abnormal manner, such as when the system receives invalid input for the pointer or when a device with active pointers departs abruptly.
+        /// If the application receiving the input is in a position to do so, it should treat the interaction as not completed and reverse any effects of the concerned pointer.
+        /// </summary>
+        CANCELLED = 0x000008000,
+
+        /// <summary>
+        /// Indicates that this pointer transitioned to a down state; that is, it made contact with the digitizer surface.
+        /// </summary>
+        DOWN = 0x00010000,
+
+        /// <summary>
+        /// Indicates that this is a simple update that does not include pointer state changes.
+        /// </summary>
+        UPDATE = 0x00020000,
+
+        /// <summary>
+        /// Indicates that this pointer transitioned to an up state; that is, contact with the digitizer surface ended.
+        /// </summary>
+        UP = 0x00040000,
+
+        /// <summary>
+        /// Indicates input associated with a pointer wheel. For mouse pointers, this is equivalent to the action of the mouse scroll wheel (WM_MOUSEHWHEEL).
+        /// </summary>
+        WHEEL = 0x00080000,
+
+        /// <summary>
+        /// Indicates input associated with a pointer h-wheel. For mouse pointers, this is equivalent to the action of the mouse horizontal scroll wheel (WM_MOUSEHWHEEL).
+        /// </summary>
+        HWHEEL = 0x00100000,
+
+        /// <summary>
+        /// Indicates that this pointer was captured by (associated with) another element and the original element has lost capture (see WM_POINTERCAPTURECHANGED).
+        /// </summary>
+        CAPTURECHANGED = 0x00200000,
+
+        /// <summary>
+        /// Indicates that this pointer has an associated transform.
+        /// </summary>
+        HASTRANSFORM = 0x00400000,
+    }
+
+    /// <summary>
+    /// Identifies a change in the state of a button associated with a pointer.
+    /// </summary>
+    public enum PointerButtonChangeType
+    {
+        /// <summary>
+        /// No change in button state.
+        /// </summary>
+        NONE,
+
+        /// <summary>
+        /// The first button (see POINTER_FLAG_FIRSTBUTTON) transitioned to a pressed state.
+        /// </summary>
+        FIRSTBUTTON_DOWN,
+
+        /// <summary>
+        /// The first button (see POINTER_FLAG_FIRSTBUTTON) transitioned to a released state.
+        /// </summary>
+        FIRSTBUTTON_UP,
+
+        /// <summary>
+        /// The second button (see POINTER_FLAG_SECONDBUTTON) transitioned to a pressed state.
+        /// </summary>
+        SECONDBUTTON_DOWN,
+
+        /// <summary>
+        /// The second button (see POINTER_FLAG_SECONDBUTTON) transitioned to a released state.
+        /// </summary>
+        SECONDBUTTON_UP,
+
+        /// <summary>
+        /// The third button (see POINTER_FLAG_THIRDBUTTON) transitioned to a pressed state.
+        /// </summary>
+        THIRDBUTTON_DOWN,
+
+        /// <summary>
+        /// The third button (see POINTER_FLAG_THIRDBUTTON) transitioned to a released state.
+        /// </summary>
+        THIRDBUTTON_UP,
+
+        /// <summary>
+        /// The fourth button (see POINTER_FLAG_FOURTHBUTTON) transitioned to a pressed state.
+        /// </summary>
+        FOURTHBUTTON_DOWN,
+
+        /// <summary>
+        /// The fourth button (see POINTER_FLAG_FOURTHBUTTON) transitioned to a released state.
+        /// </summary>
+        FOURTHBUTTON_UP,
+
+        /// <summary>
+        /// The fifth button (see POINTER_FLAG_FIFTHBUTTON) transitioned to a pressed state.
+        /// </summary>
+        FIFTHBUTTON_DOWN,
+
+        /// <summary>
+        /// The fifth button (see POINTER_FLAG_FIFTHBUTTON) transitioned to a released state.
+        /// </summary>
+        FIFTHBUTTON_UP
+    }
+
+    /// <summary>
+    /// Values that can appear in the touchFlags field of the POINTER_TOUCH_INFO structure.
+    /// </summary>
+    [Flags]
+    public enum TouchFlags
+    {
+        /// <summary>
+        /// The default value.
+        /// </summary>
+        NONE = 0x00000000
+    }
+
+    /// <summary>
+    /// Values that can appear in the touchMask field of the POINTER_TOUCH_INFO structure.
+    /// </summary>
+    [Flags]
+    public enum TouchMask
+    {
+        /// <summary>
+        /// Default. None of the optional fields are valid.
+        /// </summary>
+        NONE = 0x00000000,
+
+        /// <summary>
+        /// <see cref="POINTER_TOUCH_INFO.rcContact"/> of the <see cref="POINTER_TOUCH_INFO"/> structure is valid.
+        /// </summary>
+        CONTACTAREA = 0x00000001,
+
+        /// <summary>
+        /// <see cref="POINTER_TOUCH_INFO.orientation"/> of the <see cref="POINTER_TOUCH_INFO"/> structure is valid.
+        /// </summary>
+        ORIENTATION = 0x00000002,
+
+        /// <summary>
+        /// <see cref="POINTER_TOUCH_INFO.pressure"/> of the <see cref="POINTER_TOUCH_INFO"/> structure is valid.
+        /// </summary>
+        PRESSURE = 0x00000004,
+    }
+
+    internal class Win32Constants
+    {
+        public static IntPtr TRUE = new IntPtr(1);
+        public static IntPtr FALSE = new IntPtr(0);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SYSTEMTIME
+    {
+        [MarshalAs(UnmanagedType.U2)] public short Year;
+        [MarshalAs(UnmanagedType.U2)] public short Month;
+        [MarshalAs(UnmanagedType.U2)] public short DayOfWeek;
+        [MarshalAs(UnmanagedType.U2)] public short Day;
+        [MarshalAs(UnmanagedType.U2)] public short Hour;
+        [MarshalAs(UnmanagedType.U2)] public short Minute;
+        [MarshalAs(UnmanagedType.U2)] public short Second;
+        [MarshalAs(UnmanagedType.U2)] public short Milliseconds;
+    }
+
+    [Flags]
+    public enum ProcessAccessFlags : uint
+    {
+        All = 0x001F0FFF,
+        Terminate = 0x00000001,
+        CreateThread = 0x00000002,
+        VirtualMemoryOperation = 0x00000008,
+        VirtualMemoryRead = 0x00000010,
+        VirtualMemoryWrite = 0x00000020,
+        DuplicateHandle = 0x00000040,
+        CreateProcess = 0x000000080,
+        SetQuota = 0x00000100,
+        SetInformation = 0x00000200,
+        QueryInformation = 0x00000400,
+        QueryLimitedInformation = 0x00001000,
+        Synchronize = 0x00100000
+    }
+
+    [Flags]
+    public enum AllocationType
+    {
+        Commit = 0x1000,
+        Reserve = 0x2000,
+        Decommit = 0x4000,
+        Release = 0x8000,
+        Reset = 0x80000,
+        Physical = 0x400000,
+        TopDown = 0x100000,
+        WriteWatch = 0x200000,
+        LargePages = 0x20000000
+    }
+
+    [Flags]
+    public enum MemoryProtection
+    {
+        Execute = 0x10,
+        ExecuteRead = 0x20,
+        ExecuteReadWrite = 0x40,
+        ExecuteWriteCopy = 0x80,
+        NoAccess = 0x01,
+        ReadOnly = 0x02,
+        ReadWrite = 0x04,
+        WriteCopy = 0x08,
+        GuardModifierflag = 0x100,
+        NoCacheModifierflag = 0x200,
+        WriteCombineModifierflag = 0x400
     }
 }
 #pragma warning restore

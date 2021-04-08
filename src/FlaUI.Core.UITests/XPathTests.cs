@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿using FlaUI.Core.Definitions;
 using FlaUI.Core.Tools;
 using FlaUI.Core.UITests.TestFramework;
 using NUnit.Framework;
@@ -11,7 +11,7 @@ namespace FlaUI.Core.UITests
         [Test]
         public void NotepadFindFirst()
         {
-            using (var automation = TestUtilities.GetAutomation(AutomationType.UIA3))
+            using (var automation = UtilityMethods.GetAutomation(AutomationType.UIA3))
             {
                 var app = Application.Launch("notepad.exe");
                 var window = app.GetMainWindow(automation);
@@ -26,7 +26,7 @@ namespace FlaUI.Core.UITests
         [Test]
         public void NotePadFindAll()
         {
-            using (var automation = TestUtilities.GetAutomation(AutomationType.UIA3))
+            using (var automation = UtilityMethods.GetAutomation(AutomationType.UIA3))
             {
                 var app = Application.Launch("notepad.exe");
                 var window = app.GetMainWindow(automation);
@@ -40,9 +40,23 @@ namespace FlaUI.Core.UITests
         }
 
         [Test]
+        public void NotepadFindByAutomationId()
+        {
+            using (var automation = UtilityMethods.GetAutomation(AutomationType.UIA3))
+            {
+                var app = Application.Launch("notepad.exe");
+                var window = app.GetMainWindow(automation);
+                var elem = window.FindAllByXPath("//*[@AutomationId=15]");
+                Assert.That(elem.Length, Is.EqualTo(1));
+                Assert.That(elem[0].ControlType, Is.EqualTo(ControlType.Document));
+                app.Close();
+            }
+        }
+
+        [Test]
         public void NotePadFindAllIndexed()
         {
-            using (var automation = TestUtilities.GetAutomation(AutomationType.UIA3))
+            using (var automation = UtilityMethods.GetAutomation(AutomationType.UIA3))
             {
                 var app = Application.Launch("notepad.exe");
                 var window = app.GetMainWindow(automation);
@@ -58,6 +72,33 @@ namespace FlaUI.Core.UITests
             }
         }
 
+        [Test]
+        public void PaintFindElementBelowUnknown()
+        {
+            using (var automation = UtilityMethods.GetAutomation(AutomationType.UIA3))
+            {
+                var app = Application.Launch("mspaint.exe");
+                var window = app.GetMainWindow(automation);
+                var button = window.FindFirstByXPath($"//Button[@Name='{GetPaintBrushName()}']");
+
+                Assert.That(button, Is.Not.Null);
+                app.Close();
+            }
+        }
+
+        [Test]
+        public void PaintReferenceElementWithUnknownType()
+        {
+            using (var automation = UtilityMethods.GetAutomation(AutomationType.UIA3))
+            {
+                var app = Application.Launch("mspaint.exe");
+                var window = app.GetMainWindow(automation);
+                var unknown = window.FindFirstByXPath("//Custom");
+                Assert.That(unknown, Is.Not.Null);
+                app.Close();
+            }
+        }
+
         private string GetFileMenuText()
         {
             switch (OperatingSystem.CurrentCulture.TwoLetterISOLanguageName)
@@ -66,6 +107,17 @@ namespace FlaUI.Core.UITests
                     return "Datei";
                 default:
                     return "File";
+            }
+        }
+
+        private string GetPaintBrushName()
+        {
+            switch (OperatingSystem.CurrentCulture.TwoLetterISOLanguageName)
+            {
+                case "de":
+                    return "Pinsel";
+                default:
+                    return "Brushes";
             }
         }
     }

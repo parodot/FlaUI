@@ -4,12 +4,17 @@ namespace FlaUI.Core.Logging
 {
     public interface ILogger
     {
-        bool IsTraceEnabled { get; }
-        bool IsDebugEnabled { get; }
-        bool IsInfoEnabled { get; }
-        bool IsWarnEnabled { get; }
-        bool IsErrorEnabled { get; }
-        bool IsFatalEnabled { get; }
+        bool IsTraceEnabled { get; set; }
+        bool IsDebugEnabled { get; set; }
+        bool IsInfoEnabled { get; set; }
+        bool IsWarnEnabled { get; set; }
+        bool IsErrorEnabled { get; set; }
+        bool IsFatalEnabled { get; set; }
+
+        /// <summary>
+        /// Sets up to which level the logger should log messages.
+        /// </summary>
+        void SetLevel(LogLevel level);
 
         void Log(LogLevel logLevel, string message, params object[] args);
         void Log(LogLevel logLevel, string message, Exception exception, params object[] args);

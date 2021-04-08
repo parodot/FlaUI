@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-using FlaUI.Core.AutomationElements.Infrastructure;
 using FlaUI.Core.Definitions;
-using FlaUI.Core.Input;
 using FlaUI.Core.Patterns;
 
 namespace FlaUI.Core.AutomationElements
@@ -19,6 +17,11 @@ namespace FlaUI.Core.AutomationElements
         public ComboBox(FrameworkAutomationElementBase frameworkAutomationElement) : base(frameworkAutomationElement)
         {
         }
+
+        /// <summary>
+        /// Timespan to wait until the animation for opening/closing is finished.
+        /// </summary>
+        public TimeSpan AnimationDuration { get; set; } = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
         /// Pattern object for the <see cref="IValuePattern"/>.
@@ -192,13 +195,10 @@ namespace FlaUI.Core.AutomationElements
             {
                 // WPF
                 var ecp = Patterns.ExpandCollapse.PatternOrDefault;
-                if (ecp != null)
-                {
-                    ecp.Expand();
-                    // Wait a bit in case there is an open animation
-                    Thread.Sleep(50);
-                }
+                ecp?.Expand();
             }
+            // Wait a bit in case there is an open animation
+            Thread.Sleep(AnimationDuration);
         }
 
         /// <summary>
@@ -230,7 +230,8 @@ namespace FlaUI.Core.AutomationElements
                 var ecp = Patterns.ExpandCollapse.PatternOrDefault;
                 ecp?.Collapse();
             }
-            Wait.UntilResponsive(this);
+            // Wait a bit in case there is a close animation
+            Thread.Sleep(AnimationDuration);
         }
 
         /// <summary>

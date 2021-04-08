@@ -23,7 +23,8 @@ namespace FlaUI.Core.UITests.Elements
         [OneTimeSetUp]
         public void TestOneTimeSetup()
         {
-            _mainWindow = App.GetMainWindow(Automation);
+            _mainWindow = Retry.WhileNull(() => Application.GetMainWindow(Automation), TimeSpan.FromSeconds(1)).Result;
+            Assert.That(_mainWindow, Is.Not.Null);
         }
 
         [Test]
@@ -78,6 +79,7 @@ namespace FlaUI.Core.UITests.Elements
         public void EditableTextTest()
         {
             var combo = _mainWindow.FindFirstDescendant(cf => cf.ByAutomationId("EditableCombo")).AsComboBox();
+            Assert.That(combo, Is.Not.Null);
             combo.EditableText = "Item 3";
             Assert.That(combo.SelectedItem, Is.Not.Null);
             Assert.That(combo.SelectedItem.Text, Is.EqualTo("Item 3"));
@@ -87,10 +89,25 @@ namespace FlaUI.Core.UITests.Elements
         public void AssertMessageBoxCanBeRetrievedInSelection()
         {
             var combo = _mainWindow.FindFirstDescendant(cf => cf.ByAutomationId("NonEditableCombo")).AsComboBox();
+            combo.Expand();
             combo.Items[3].Click();
-            var window = Retry.While(() => _mainWindow.FindFirstDescendant(cf => cf.ByClassName("#32770"))?.AsWindow(), w => w == null, TimeSpan.FromMilliseconds(1000));
+            var retryResult = Retry.While(() => _mainWindow.FindFirstDescendant(cf => cf.ByClassName("#32770"))?.AsWindow(), w => w == null, TimeSpan.FromMilliseconds(1000));
+            var window = retryResult.Result;
             Assert.That(window, Is.Not.Null, "Expected a window that was shown when combobox item was selected");
             window.FindFirstDescendant(cf => cf.ByAutomationId("Close")).AsButton().Invoke();
+        }
+
+        [Test]
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        public void ComboBoxItemIsNotOffscreen(int comboBoxItem)
+        {
+            var combo = _mainWindow.FindFirstDescendant(cf => cf.ByAutomationId("NonEditableCombo")).AsComboBox();
+            var isOffscreen = combo.Items[comboBoxItem].IsOffscreen;
+            Assert.IsFalse(isOffscreen);
+            combo.Collapse();
         }
     }
 }

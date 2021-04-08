@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using FlaUI.Core.AutomationElements.Infrastructure;
 using FlaUI.Core.Exceptions;
 using FlaUI.Core.Input;
 using FlaUI.Core.WindowsAPI;
@@ -39,6 +38,10 @@ namespace FlaUI.Core.AutomationElements
                 {
                     return textPattern.DocumentRange.GetText(Int32.MaxValue);
                 }
+                if (Win32Fallback.GetTextWin32(this, out string textWin32))
+                {
+                    return textWin32;
+                }
                 throw new MethodNotSupportedException($"AutomationElement '{ToString()}' supports neither ValuePattern or TextPattern");
             }
             set
@@ -46,9 +49,12 @@ namespace FlaUI.Core.AutomationElements
                 if (Patterns.Value.TryGetPattern(out var valuePattern))
                 {
                     valuePattern.SetValue(value);
+                    return;
                 }
-                else
+                // Fallback to Win32
+                if (!Win32Fallback.SetTextWin32(this, value))
                 {
+                    // Fallback to enter the value by keyboard
                     Enter(value);
                 }
             }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using FlaUI.Core.AutomationElements.Infrastructure;
 using FlaUI.Core.AutomationElements.PatternElements;
 using FlaUI.Core.Definitions;
 
@@ -13,6 +12,7 @@ namespace FlaUI.Core.AutomationElements
     {
         private readonly SelectionItemAutomationElement _selectionItemAutomationElement;
         private readonly ExpandCollapseAutomationElement _expandCollapseAutomationElement;
+        private readonly ToggleAutomationElement _toggleAutomationElement;
 
         /// <summary>
         /// Creates a <see cref="TreeItem"/> element.
@@ -21,6 +21,7 @@ namespace FlaUI.Core.AutomationElements
         {
             _selectionItemAutomationElement = new SelectionItemAutomationElement(frameworkAutomationElement);
             _expandCollapseAutomationElement = new ExpandCollapseAutomationElement(frameworkAutomationElement);
+            _toggleAutomationElement = new ToggleAutomationElement(frameworkAutomationElement);
         }
 
         /// <summary>
@@ -108,6 +109,15 @@ namespace FlaUI.Core.AutomationElements
         {
             return FindAllChildren(cf => cf.ByControlType(ControlType.TreeItem))
                 .Select(e => e.AsTreeItem()).ToArray();
+        }
+
+        /// <summary>
+        /// Gets or sets if the tree item is checked, if checking is supported.
+        /// </summary>
+        public bool? IsChecked
+        {
+            get => _toggleAutomationElement.IsToggled;
+            set => _toggleAutomationElement.IsToggled = value;
         }
     }
 }

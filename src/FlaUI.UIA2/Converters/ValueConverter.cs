@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Drawing;
 using System.Globalization;
-using FlaUI.Core.AutomationElements.Infrastructure;
+using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
-using FlaUI.Core.Shapes;
+using FlaUI.Core.Tools;
 using UIA = System.Windows.Automation;
 
 namespace FlaUI.UIA2.Converters
 {
+    /// <summary>
+    /// Class that helps converting various values between native and FlaUIs format.
+    /// </summary>
     public static class ValueConverter
     {
         /// <summary>
@@ -18,27 +22,32 @@ namespace FlaUI.UIA2.Converters
             {
                 return null;
             }
-            if (val is ControlType)
+            if (val is ControlType controlType)
             {
-                val = (UIA.ControlType)ControlTypeConverter.ToControlTypeNative((ControlType)val);
+                val = (UIA.ControlType)ControlTypeConverter.ToControlTypeNative(controlType);
             }
-            else if (val is AutomationElement)
+            else if (val is AutomationElement automationElement)
             {
-                val = ToNative((AutomationElement)val);
+                val = ToNative(automationElement);
             }
             return val;
         }
 
+        /// <summary>
+        /// Converts a native rectangle to a <see cref="Rectangle"/>.
+        /// </summary>
+        /// <param name="rectangle">The native rectangle to convert.</param>
+        /// <returns>The converted managed rectangle.</returns>
         public static object ToRectangle(object rectangle)
         {
             var origValue = (System.Windows.Rect)rectangle;
-            return new Rectangle(origValue.X, origValue.Y, origValue.Width, origValue.Height);
+            return new Rectangle(origValue.X.ToInt(), origValue.Y.ToInt(), origValue.Width.ToInt(), origValue.Height.ToInt());
         }
 
         public static object ToPoint(object point)
         {
             var origValue = (System.Windows.Point)point;
-            return new Point(origValue.X, origValue.Y);
+            return new Point(origValue.X.ToInt(), origValue.Y.ToInt());
         }
 
         public static object ToCulture(object cultureId)

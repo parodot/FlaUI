@@ -1,5 +1,4 @@
-﻿using FlaUI.Core.AutomationElements.Infrastructure;
-using FlaUI.Core.Definitions;
+﻿using FlaUI.Core.Definitions;
 using FlaUI.Core.Patterns;
 
 namespace FlaUI.Core.AutomationElements.PatternElements
@@ -9,14 +8,20 @@ namespace FlaUI.Core.AutomationElements.PatternElements
     /// </summary>
     public class ExpandCollapseAutomationElement : AutomationElement
     {
+        /// <summary>
+        ///  Creates an expand/collapse element object from a given element.
+        /// </summary>
         public ExpandCollapseAutomationElement(FrameworkAutomationElementBase frameworkAutomationElement) : base(frameworkAutomationElement)
         {
         }
 
+        /// <summary>
+        ///  Provides direct access to the expand/collapse pattern.
+        /// </summary>
         public IExpandCollapsePattern ExpandCollapsePattern => Patterns.ExpandCollapse.Pattern;
 
         /// <summary>
-        /// Gets the current expand / collapse state.
+        /// Gets the current expand/collapse state.
         /// </summary>
         public ExpandCollapseState ExpandCollapseState => ExpandCollapsePattern.ExpandCollapseState;
 
@@ -33,7 +38,7 @@ namespace FlaUI.Core.AutomationElements.PatternElements
         /// </summary>
         public void Collapse()
         {
-            ExpandCollapsePattern.Expand();
+            ExpandCollapsePattern.Collapse();
         }
     }
 }

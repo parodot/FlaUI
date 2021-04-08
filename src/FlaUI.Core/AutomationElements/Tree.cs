@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using FlaUI.Core.AutomationElements.Infrastructure;
 using FlaUI.Core.Definitions;
 
 namespace FlaUI.Core.AutomationElements

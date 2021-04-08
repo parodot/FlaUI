@@ -1,4 +1,5 @@
-﻿using FlaUI.Core.Input;
+﻿using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Input;
 using FlaUI.Core.UITests.TestFramework;
 using NUnit.Framework;
 
@@ -18,10 +19,10 @@ namespace FlaUI.Core.UITests.Elements
         [Test]
         public void ContextMenuTest()
         {
-            RestartApp();
-            var window = App.GetMainWindow(Automation);
+            RestartApplication();
+            var window = Application.GetMainWindow(Automation);
             var btn = window.FindFirstDescendant(cf => cf.ByName("ContextMenu")).AsButton();
-            Mouse.Click(MouseButton.Right, btn.GetClickablePoint());
+            Mouse.Click(btn.GetClickablePoint(), MouseButton.Right);
             Wait.UntilInputIsProcessed();
             var ctxMenu = window.ContextMenu;
             Assert.That(ctxMenu, Is.Not.Null);

@@ -1,7 +1,7 @@
 ﻿using System;
-using FlaUI.Core.AutomationElements.Infrastructure;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Patterns;
+using FlaUI.Core.WindowsAPI;
 
 namespace FlaUI.Core.AutomationElements.PatternElements
 {
@@ -27,17 +27,37 @@ namespace FlaUI.Core.AutomationElements.PatternElements
         /// </summary>
         public ToggleState ToggleState
         {
-            get => TogglePattern.ToggleState.Value;
+            get
+            {
+                if (Patterns.Toggle.IsSupported)
+                {
+                    return TogglePattern.ToggleState.Value;
+                }
+                // Try the Win32 fallback
+                var state = Win32Fallback.GetToggleStateWin32(this);
+                if (!state.HasValue)
+                {
+                    throw new Exception("Failed to get state of the toggle");
+                }
+                return state.Value;
+            }
             set
             {
-                // Loop for all states
-                for (var i = 0; i < Enum.GetNames(typeof(ToggleState)).Length; i++)
+                if (Patterns.Toggle.IsSupported)
                 {
-                    // Break if we're in the correct state
-                    if (ToggleState == value) return;
-                    // Toggle to the next state
-                    Toggle();
+                    // Loop for all states
+                    for (var i = 0; i < Enum.GetNames(typeof(ToggleState)).Length; i++)
+                    {
+                        // Break if we're in the correct state
+                        if (ToggleState == value) return;
+                        // Toggle to the next state
+                        Toggle();
+                    }
+                    return;
                 }
+
+                // Try with the win32 fallback
+                Win32Fallback.SetToggleStateWin32(this, value);
             }
         }
 

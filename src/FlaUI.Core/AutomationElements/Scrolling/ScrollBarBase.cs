@@ -1,5 +1,4 @@
-﻿using FlaUI.Core.AutomationElements.Infrastructure;
-using FlaUI.Core.Definitions;
+﻿using FlaUI.Core.Definitions;
 using FlaUI.Core.Patterns;
 
 namespace FlaUI.Core.AutomationElements.Scrolling
@@ -9,6 +8,9 @@ namespace FlaUI.Core.AutomationElements.Scrolling
     /// </summary>
     public abstract class ScrollBarBase : AutomationElement
     {
+        /// <summary>
+        /// Creates a scroll bar element from the given element.
+        /// </summary>
         protected ScrollBarBase(FrameworkAutomationElementBase frameworkAutomationElement) : base(frameworkAutomationElement)
         {
         }
